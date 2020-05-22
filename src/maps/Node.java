@@ -1,9 +1,7 @@
 package maps;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 public class Node {
@@ -32,7 +30,6 @@ public class Node {
 
 	public Node(int x, int y, int size, boolean wall, int verticalOffset, boolean coin, boolean energizer) {
 		this.x = x;
-		// this.y = y+verticalOffset;
 		this.y = y;
 		this.size = size;
 		this.wall = wall;
@@ -41,34 +38,6 @@ public class Node {
 	}
 
 	public void setNeighbours(Node[][] nodes) {
-		// if((y-verticalOffset)>0) {
-		// if(!nodes[(y-verticalOffset)-1][x].isWall())
-		// neighbours[0] = nodes[(y-verticalOffset)-1][x];
-		// }
-		// if((y-verticalOffset)<nodes.length-1) {
-		// if(!nodes[(y-verticalOffset)+1][x].isWall())
-		// neighbours[1] = nodes[(y-verticalOffset)+1][x];
-		// }
-		// if(x>0) {
-		// if(!nodes[(y-verticalOffset)][x-1].isWall())
-		// neighbours[2] = nodes[(y-verticalOffset)][x-1];
-		// }
-		// if(x<nodes[(y-verticalOffset)].length-1) {
-		// if(!nodes[(y-verticalOffset)][x+1].isWall())
-		// neighbours[3] = nodes[(y-verticalOffset)][x+1];
-		// }
-		//
-		// if(x==0) {
-		// if(!isWall()) {
-		// neighbours[2] = nodes[(y-verticalOffset)][nodes[y-verticalOffset].length-1];
-		// }
-		// }
-		//
-		// if(x==nodes[(y-verticalOffset)].length-1) {
-		// if(!isWall()) {
-		// neighbours[3] = nodes[(y-verticalOffset)][0];
-		// }
-		// }
 		if (y > 0) {
 			if (!nodes[y - 1][x].isWall())
 				neighbours[0] = nodes[y - 1][x];
@@ -114,17 +83,32 @@ public class Node {
 		// g.drawRect(getRect().x, getRect().y, getRect().width, getRect().height);
 		// }
 		if (coin) {
-			g.setColor(Color.WHITE);
+			g.setColor(new Color(0xFF, 0xFD, 0xD0));
 			g.fillRect((x * size) + (size / 2) - coinSize, ((y + verticalOffset) * size) + (size / 2) - coinSize,
 					coinSize, coinSize);
 		} else if (energizer) {
-			g.setColor(Color.WHITE);
-			// Graphics2D g2d = (Graphics2D) g;
-			// g2d.setStroke(new BasicStroke(2));
+			g.setColor(new Color(0xFF, 0xE5, 0xB4));
 			g.fillOval(x * size, (y + verticalOffset) * size, energizerSize, energizerSize);
 		}
 	}
-
+	
+	public void render(Graphics g, boolean renderEnergizer) {
+		if (coin) {
+			g.setColor(Color.YELLOW);
+			g.fillRect((x * size) + (size / 2) - coinSize, ((y + verticalOffset) * size) + (size / 2) - coinSize,
+					coinSize, coinSize);
+		} else if (energizer && renderEnergizer) {
+			g.setColor(Color.WHITE);
+			g.fillOval(x * size, (y + verticalOffset) * size, energizerSize, energizerSize);
+		}
+	}
+	
+	public void render(Graphics g, Color color) {
+		render(g);
+		g.setColor(color);
+		g.fillRect(x * size, (y + verticalOffset) * size, size, size);
+	}
+	
 	public void resetForAStar() {
 		fScore = 0;
 		gScore = 0;
@@ -135,13 +119,7 @@ public class Node {
 	public void resetForDFS() {
 		visited = false;
 		previous = null;
-		// lastDir = -1;
-	}
-
-	public void render(Graphics g, Color color) {
-		render(g);
-		g.setColor(color);
-		g.fillRect(x * size, (y + verticalOffset) * size, size, size);
+		 lastDir = -1;
 	}
 
 	public boolean equals(Node other) {

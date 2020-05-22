@@ -12,7 +12,7 @@ public class Map {
 	private int cols;
 	private final int verticalOffset = 3;
 	
-	private final int SIZE = 16;
+	private final int SIZE = 8*2;
 	private BufferedImage img;
 	
 	public Map(int rows, int cols, String fileName, BufferedImage img) {
@@ -59,7 +59,9 @@ public class Map {
 	}
 	
 	public void render(Graphics g) {
+		
 		g.drawImage(img, 0, verticalOffset*SIZE, nodes[0].length*SIZE, nodes.length*SIZE, null);
+//		g.drawImage(img, 0, verticalOffset*SIZE, Game.CANVAS_WIDTH, Game.CANVAS_HEIGHT, null);
 		for(int i = 0; i<rows; i++) {
 			for(int j = 0; j<cols; j++) {
 				this.nodes[i][j].render(g);
