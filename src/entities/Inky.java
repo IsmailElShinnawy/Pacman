@@ -1,9 +1,12 @@
 package entities;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Point;
 
 import gfx.Assets;
 import maps.Map;
+import maps.Node;
 
 public class Inky extends Ghost{
 
@@ -22,6 +25,16 @@ public class Inky extends Ghost{
 		
 		setCurrentAnimation(DOWN);
 		setCurrentFrame(0);
+	}
+	
+	public void render(Graphics g) {
+		super.render(g);
+		
+		if(isVisPath()) {
+			for(Node n: getPath()) {
+				n.render(g, new Color(100, 0, 150, 100));
+			}
+		}
 	}
 
 }

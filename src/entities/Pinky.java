@@ -29,8 +29,11 @@ public class Pinky extends Ghost{
 	
 	public void render(Graphics g) {
 		super.render(g);
-//		for (Node n : getPath()) {
-//			n.render(g, new Color(255, 192, 203, 100));
-//		}
+		
+		if(isVisPath()) {
+			for (Node n : getPath()) {
+				n.render(g, new Color(255, 192, 203, 100));
+			}
+		}
 	}
 }
