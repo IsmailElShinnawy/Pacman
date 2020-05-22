@@ -19,7 +19,7 @@ public class Game implements Runnable {
 
 	private GameStateManager gsm;
 	private KeyManager keyManager;
-
+	
 	public Game() {
 		start();
 	}
@@ -92,8 +92,8 @@ public class Game implements Runnable {
 		double timePerTick = 1000000000 / fps;
 		long now;
 		long lastTime = System.nanoTime();
-//		long timer = 0;
 		double delta = 0;
+//		long timer = 0;
 //		int ticks = 0;
 
 		while (running) {
