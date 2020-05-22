@@ -1,8 +1,9 @@
 package utils;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class LevelReader {
@@ -10,7 +11,9 @@ public class LevelReader {
 	public static int[][] read(String fileName){
 		int[][] tokens = null;
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(fileName));
+//			BufferedReader br = new BufferedReader(new FileReader(fileName));
+			InputStream is = LevelReader.class.getResourceAsStream(fileName);
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			int rows = Integer.parseInt(br.readLine());
 			int cols = Integer.parseInt(br.readLine());
 			tokens = new int[rows][cols];
