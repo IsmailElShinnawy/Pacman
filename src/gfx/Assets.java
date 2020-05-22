@@ -1,23 +1,26 @@
 package gfx;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
 public class Assets {
 	
-	private static final String spritesheetFileName = "res/sprites/spritesheet.png";
+	private static final String spritesheetFileName = "/sprites/spritesheet.png";
 	private static final int size = 12;
 	public static BufferedImage[] pacmanUp, pacmanRight, pacmanDown, pacmanLeft, pacmanDead;
-	public static BufferedImage[] alphabets, numbers;
+	public static BufferedImage[] alphabets, numbers, ghostScores;
 	public static BufferedImage[] blinkyUp, blinkyRight, blinkyDown, blinkyLeft;
 	public static BufferedImage[] pinkyUp, pinkyRight, pinkyDown, pinkyLeft;
 	public static BufferedImage[] inkyUp, inkyRight, inkyDown, inkyLeft;
 	public static BufferedImage[] clydeUp, clydeRight, clydeDown, clydeLeft;
 	public static BufferedImage[] frightened, frightenedFade, deadUp, deadDown, deadLeft, deadRight;
 	public static BufferedImage map;
+	
+//	public static JFrame jframe;
+//	public static Canvas canvas;
 	
 	public static void init() {
 		pacmanUp = new BufferedImage[3];
@@ -57,9 +60,12 @@ public class Assets {
 		
 		alphabets = new BufferedImage[26];
 		numbers = new BufferedImage[10];
+		ghostScores = new BufferedImage[4];
 		
 		try {
-			BufferedImage spritesheet = ImageIO.read(new File(spritesheetFileName));
+//			BufferedImage spritesheet = ImageIO.read(new File(spritesheetFileName));
+			InputStream is = Assets.class.getResourceAsStream(spritesheetFileName);
+			BufferedImage spritesheet = ImageIO.read(is);
 			
 			BufferedImage closed = spritesheet.getSubimage(0, size*14, size*2, size*2);
 			pacmanUp[0] = closed;
@@ -153,8 +159,14 @@ public class Assets {
 				numbers[i] = spritesheet.getSubimage(i*size, 0, size, size);
 			}
 			
-			map = ImageIO.read(new File("res/maps/map.jpg"));
+			startX = size*16;
+			startY = size*12;
+			for(int i = 0; i<ghostScores.length; i++) {
+				ghostScores[i] = spritesheet.getSubimage(startX+(i*2*size), startY, size*2, size*2);
+			}
 			
+			InputStream is1 = Assets.class.getResourceAsStream("/maps/map_resized.jpg");
+			map = ImageIO.read(is1);
 			
 		}catch(IOException e) {
 			e.printStackTrace();
