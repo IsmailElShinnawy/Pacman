@@ -28,9 +28,17 @@ public abstract class Ghost extends Entity {
 	private Stack<Node> path;
 	private boolean found;
 
+	private int reviveTime = 5000;
+	private int reviveTimer = 0;
+	private long lastTime;
+	private long now;
+
 	private boolean chase = false;
 	private boolean scatter = true;
 	private boolean frightened = false;
+	private boolean reviving = false;
+
+	private boolean visPath = false;
 
 	public static final int UP = 0;
 	public static final int RIGHT = 1;
@@ -68,7 +76,14 @@ public abstract class Ghost extends Entity {
 
 		if (isDead()) {
 			if (current.equals(getMap().getNodes()[MONSTER_PANE.y][MONSTER_PANE.x])) {
-				revive();
+				reviving = true;
+				now = System.currentTimeMillis();
+				reviveTimer += (now-lastTime);
+				if(reviveTimer>=reviveTime) {
+					reviveTimer = 0;
+					revive();
+				}
+				lastTime = System.currentTimeMillis();
 			} else {
 				astar(target);
 			}
@@ -132,17 +147,21 @@ public abstract class Ghost extends Entity {
 
 	@Override
 	public void render(Graphics g) {
-		if (currentFrame < animations.get(currentAnimation).length)
-			g.drawImage(animations.get(currentAnimation)[currentFrame], (int) getX() - getSize() / 2,
-					(int) getY() - getSize() / 2, getSize() * 2, getSize() * 2, null);
+		if(!reviving) {
+			if (currentFrame < animations.get(currentAnimation).length)
+				g.drawImage(animations.get(currentAnimation)[currentFrame], (int) getX() - getSize() / 2,
+						(int) getY() - getSize() / 2, getSize() * 2, getSize() * 2, null);
 
-//		for (Node n : openList) {
-//			n.render(g, Color.GREEN);
-//		}
-//		for (Node n : closedList) {
-//			n.render(g, new Color(0, 0, 255, 100));
-//		}
 
+			if(visPath) {
+				for (Node n : openList) {
+					n.render(g, Color.GREEN);
+				}
+				for (Node n : closedList) {
+					n.render(g, new Color(0, 0, 255, 100));
+				}
+			}
+		}
 	}
 
 	public void getNextMove(int nextMove) {
@@ -228,7 +247,7 @@ public abstract class Ghost extends Entity {
 	public Point dfs(int steps) {
 		Stack<Node> stack = new Stack<Node>();
 		Node ghostNode = getMap().getNodes()[((int) getY() / getSize()) - getMap().getVerticalOffset()][(int) getX()
-				/ getSize()];
+		                                                                                                / getSize()];
 		ghostNode.setVisited(true);
 		if (getVX() > 0) {
 			ghostNode.setLastDir(1);
@@ -302,6 +321,7 @@ public abstract class Ghost extends Entity {
 
 	public void kill() {
 		setDead(true);
+		setVelocity(2);
 		setFrightened(false);
 		setCurrentFrame(0);
 		if (getVX() > 0) {
@@ -314,15 +334,18 @@ public abstract class Ghost extends Entity {
 			setCurrentAnimation(DEAD_UP);
 		}
 		setTarget(MONSTER_PANE);
+		lastTime = System.currentTimeMillis();
 	}
 
 	public void revive() {
 		setDead(false);
+		setVelocity(2);
 		setVX(0);
 		setVY(0);
 		setCurrentFrame(0);
 		setCurrentAnimation(LEFT);
 		setFrightened(false);
+		reviving = false;
 	}
 
 	public void addAnimation(BufferedImage[] animation) {
@@ -339,6 +362,18 @@ public abstract class Ghost extends Entity {
 
 	public void setTarget(Point target) {
 		this.target = target;
+	}
+
+	public void setCorner(Point corner) {
+		this.corner = corner;
+	}
+
+	public void setOtherCorner(Point otherCorner) {
+		this.otherCorner = otherCorner;
+	}
+
+	public void setVisPath(boolean visPath) {
+		this.visPath = visPath;
 	}
 
 	public Stack<Node> getPath() {
@@ -371,5 +406,21 @@ public abstract class Ghost extends Entity {
 
 	public Point getCorner() {
 		return corner;
+	}
+
+	public Point getOtherCorner() {
+		return otherCorner;
+	}
+
+	public Point getTarget() {
+		return target;
+	}
+
+	public Node getCurrent() {
+		return current;
+	}
+
+	public boolean isVisPath() {
+		return visPath;
 	}
 }
