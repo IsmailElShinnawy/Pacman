@@ -1,6 +1,5 @@
 package entities;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -33,19 +32,24 @@ public class Player extends Entity {
 	public static final int DEAD = 4;
 
 	private int score = 0;
+	private int highScore = 0;
+	private int ghostEatenScore = 200;
+	private int ghostEatenScoreIndex = -1;
+	private int xEaten = -1, yEaten = -1;
 	private int remainingLives = 3;
 
 	private long now;
 	private long lastTime;
 	private long deathTime = 3000;
 	private long deathTimer = 0;
+	private long ghostEatenScoreTime = 1000;
+	private long ghostEatenScoreTimer = 0;
+	private boolean renderGhostEatenScore = false;
 
 	private HUD hud;
-
 	private AudioPlayer munchFood;
 	private AudioPlayer death;
 	private AudioPlayer eatGhost;
-	// private AudioPlayer intermission;
 
 	public Stack<Node> dfsPath = new Stack<Node>();
 
@@ -69,20 +73,30 @@ public class Player extends Entity {
 		munchFood = new AudioPlayer("/sounds/pacman_chomp.wav");
 		death = new AudioPlayer("/sounds/pacman_death.wav");
 		eatGhost = new AudioPlayer("/sounds/pacman_eatghost.wav");
-		// intermission = new AudioPlayer("/sounds/pacman_intermission.wav");
 	}
 
 	public void tick() {
 		setTicks(getTicks() + 1);
 		updateFrame();
-
+		
+		if(score>highScore) {
+			highScore = score;
+		}
+		
 		if (!isDead()) {
 			getNextMove();
 			calculateCorners();
 
-			collideWithGhosts();
 			collideWithCoin();
 			collideWithEnergizer();
+			collideWithGhosts();
+			
+			now = System.currentTimeMillis();
+			ghostEatenScoreTimer += (now-lastTime);
+			if(ghostEatenScoreTimer>=ghostEatenScoreTime) {
+				renderGhostEatenScore = false;
+			}
+			lastTime = System.currentTimeMillis();
 
 			if (getVX() > 0) {
 				currentAnimation = RIGHT;
@@ -107,6 +121,9 @@ public class Player extends Entity {
 		}
 		if (getTicks() == Entity.FRAMES_BEFORE_UPDATE) {
 			setTicks(0);
+			if(keyManager.getKeys()[KeyManager.SPACE]) {
+				listener.onSpaceBarPress();
+			}
 		}
 	}
 
@@ -150,6 +167,11 @@ public class Player extends Entity {
 		if (currentFrame < animations.get(currentAnimation).length)
 			g.drawImage(animations.get(currentAnimation)[currentFrame], (int) getX() - getSize() / 2,
 					(int) getY() - getSize() / 2, getSize() * 2, getSize() * 2, null);
+		
+		if(xEaten!=-1 && yEaten!=-1 && renderGhostEatenScore) {
+			g.drawImage(Assets.ghostScores[ghostEatenScoreIndex], xEaten, yEaten, getSize()*2, getSize()*2, null);
+		}
+	
 		hud.render(g);
 		// g.setColor(Color.GREEN);
 		// g.fillRect((int)getX(), (int)getY(), getSize(), getSize());
@@ -168,6 +190,7 @@ public class Player extends Entity {
 		}
 
 		if (getMap().getNodes()[yPos][xPos].isCoin()) {
+			listener.onEatingDot();
 			score += 10;
 			getMap().getNodes()[yPos][xPos].setCoin(false);
 			munchFood.play();
@@ -188,9 +211,12 @@ public class Player extends Entity {
 		}
 		
 		if (getMap().getNodes()[yPos][xPos].isEnergizer()) {
+			xEaten = -1;
+			yEaten = -1;
+			ghostEatenScore = 200;
+			ghostEatenScoreIndex = -1;
 			score += 50;
 			getMap().getNodes()[yPos][xPos].setEnergizer(false);
-			// munchFood.play();
 			listener.onEatingEnergizer();
 		}
 	}
@@ -199,8 +225,18 @@ public class Player extends Entity {
 		for (Ghost g : gsm.getCurrentState().getGhosts()) {
 			if (collide(g)) {
 				if (g.isFrightened()) {
-					if(!eatGhost.isRunning())
-						eatGhost.play();
+					
+					score+=ghostEatenScore;
+					ghostEatenScore*=2;
+					ghostEatenScoreIndex++;
+					xEaten = getX();
+					yEaten = getY();
+					ghostEatenScoreTimer = 0;
+					renderGhostEatenScore = true;
+					
+					if(eatGhost.isRunning())
+						eatGhost.stop();
+					eatGhost.play();
 					g.kill();
 				} else if(!g.isDead()){
 					listener.onPlayerDeath();
@@ -209,6 +245,15 @@ public class Player extends Entity {
 		}
 	}
 
+	public void reset() {
+		score = 0;
+		ghostEatenScore = 200;
+		ghostEatenScoreIndex = -1;
+		xEaten = -1;
+		yEaten = -1;
+		remainingLives = 3;
+	}
+	
 	public void resetForRevive() {
 		setCurrentAnimation(Player.LEFT);
 		setCurrentFrame(0);
@@ -221,10 +266,6 @@ public class Player extends Entity {
 
 	public Point getPlayerTarget() {
 		if (getVX() > 0) {
-			// int x = (int) (getX() + getSize() * 1.5 - (getSize() / 2 - getPadding())) /
-			// getSize();
-			// int y = (int) ((getY() + getSize() / 2 - (getSize() / 2 - getPadding())) /
-			// getSize())
 			int x = (int) (getX() + getSize()) / getSize();
 			int y = (int) ((getY() + getSize() / 2 - (getSize() / 2 - getPadding())) / getSize())
 					- getMap().getVerticalOffset();
@@ -236,11 +277,6 @@ public class Player extends Entity {
 			return new Point(x, y);
 
 		} else if (getVY() > 0) {
-			// return new Point((int) (getX() + getSize()/2 - (getSize() / 2 -
-			// getPadding())) / getSize(),
-			// (int) ((getY() + getSize() * 1.5 - (getSize() / 2 - getPadding())) /
-			// getSize())
-			// - getMap().getVerticalOffset());
 			return new Point((int) (getX() + getSize() / 2 - (getSize() / 2 - getPadding())) / getSize(),
 					(int) ((getY() + getSize()) / getSize()) - getMap().getVerticalOffset());
 		} else {
@@ -319,6 +355,10 @@ public class Player extends Entity {
 		return score;
 	}
 
+	public int getHighScore() {
+		return highScore;
+	}
+	
 	public void setListener(PlayerListener listener) {
 		this.listener = listener;
 	}
