@@ -41,6 +41,14 @@ public class HUD {
 			g.drawImage(Assets.numbers[digit], startX+(i*SIZE), startY, SIZE, SIZE, null);
 		}
 		
+		String highScore = ""+player.getHighScore();
+		startX = 10*SIZE;
+		startY = 1*SIZE;
+		for(int i = 0; i<highScore.length(); i++) {
+			int digit = Integer.parseInt(highScore.charAt(i)+"");
+			g.drawImage(Assets.numbers[digit], startX+(i*SIZE), startY, SIZE, SIZE, null);
+		}
+		
 		startX = 0;
 		startY = 34*SIZE;
 		for(int i = 0; i<player.getRemainingLives(); i++) {
