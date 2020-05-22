@@ -16,15 +16,19 @@ public class GameView {
 		frame.setSize(new Dimension(448, 576)); //original dim is 224x288 this is scaled up by 2
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
+//		frame.setLayout(null);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		canvas = new Canvas();
-		canvas.setPreferredSize(new Dimension(448, 576));
-		canvas.setMaximumSize(new Dimension(448, 576));
-		canvas.setMinimumSize(new Dimension(448, 576));
+//		canvas.setPreferredSize(new Dimension(448, 576));
+		canvas.setSize(new Dimension(448, 576));
+//		canvas.setR
+//		canvas.setMaximumSize(new Dimension(448, 576));
+//		canvas.setMinimumSize(new Dimension(448, 576));
+		canvas.setFocusable(false);
 		
-		frame.add(canvas);
+		frame.add(canvas, null);
 		frame.pack();
 	}
 	
