@@ -8,14 +8,14 @@ import maps.Map;
 
 public abstract class Entity {
 
-	private double x;
-	private double y;
+	private int x;
+	private int y;
 
-	private double vx;
-	private double vy;
+	private int vx;
+	private int vy;
 	private int velocity;
-	private double pvx;
-	private double pvy;
+	private int pvx;
+	private int pvy;
 
 	private int padding = 1;
 
@@ -38,8 +38,8 @@ public abstract class Entity {
 	}
 
 	public void calculateCorners() {
-		double xTmp = x + vx;
-		double yTmp = y + vy;
+		int xTmp = x + vx;
+		int yTmp = y + vy;
 
 		int xPosLeft = (int) (xTmp + size / 2 - ((size / 2) - padding)) / size;
 		int yPosTop = (int) (yTmp + size / 2 - ((size / 2) - padding)) / size - map.getVerticalOffset();
@@ -61,6 +61,7 @@ public abstract class Entity {
 				if (topLeft) {
 					setX((xPosLeft + 1) * size);
 					vx = 0;
+					pvx = 0;
 				} else {
 					setX(xTmp);
 					y = yTmp;
@@ -162,27 +163,27 @@ public abstract class Entity {
 
 	public abstract void render(Graphics g);
 
-	public double getX() {
+	public int getX() {
 		return x;
 	}
 
-	public double getY() {
+	public int getY() {
 		return y;
 	}
 
-	public double getVX() {
+	public int getVX() {
 		return vx;
 	}
 
-	public double getVY() {
+	public int getVY() {
 		return vy;
 	}
 
-	public double getPVY() {
+	public int getPVY() {
 		return pvy;
 	}
 
-	public double getPVX() {
+	public int getPVX() {
 		return pvx;
 	}
 
@@ -219,7 +220,7 @@ public abstract class Entity {
 				size - padding, size - padding);
 	}
 
-	public void setX(double x) {
+	public void setX(int x) {
 		if (x < 0) {
 			x = (map.getNodes()[0].length - 1) * size;
 		} else if (x >= map.getNodes()[0].length * size) {
@@ -228,23 +229,23 @@ public abstract class Entity {
 		this.x = x;
 	}
 
-	public void setY(double y) {
+	public void setY(int y) {
 		this.y = y;
 	}
 
-	public void setVX(double vx) {
+	public void setVX(int vx) {
 		this.vx = vx;
 	}
 
-	public void setVY(double vy) {
+	public void setVY(int vy) {
 		this.vy = vy;
 	}
 
-	public void setPVX(double pvx) {
+	public void setPVX(int pvx) {
 		this.pvx = pvx;
 	}
 
-	public void setPVY(double pvy) {
+	public void setPVY(int pvy) {
 		this.pvy = pvy;
 	}
 
@@ -266,5 +267,9 @@ public abstract class Entity {
 
 	public void setTicks(int ticks) {
 		this.ticks = ticks;
+	}
+	
+	public void setMap(Map map) {
+		this.map = map;
 	}
 }
