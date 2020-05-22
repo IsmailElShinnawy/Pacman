@@ -7,10 +7,10 @@ public class KeyManager implements KeyListener{
 
 	private boolean[] keys;
 	
-	public static final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
+	public static final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3, SPACE = 4;
 	
 	public KeyManager() {
-		keys = new boolean[4];
+		keys = new boolean[5];
 	}
 	
 	@Override
@@ -29,6 +29,8 @@ public class KeyManager implements KeyListener{
 			keys[DOWN] = true;
 		}else if(e.getKeyCode()==KeyEvent.VK_LEFT || e.getKeyCode()==KeyEvent.VK_A) {
 			keys[LEFT] = true;
+		}else if(e.getKeyCode()==KeyEvent.VK_SPACE) {
+			keys[SPACE] = true;
 		}
 		
 	}
@@ -43,6 +45,8 @@ public class KeyManager implements KeyListener{
 			keys[DOWN] = false;
 		}else if(e.getKeyCode()==KeyEvent.VK_LEFT || e.getKeyCode()==KeyEvent.VK_A) {
 			keys[LEFT] = false;
+		}else if(e.getKeyCode()==KeyEvent.VK_SPACE) {
+			keys[SPACE] = false;
 		}
 	}
 	
